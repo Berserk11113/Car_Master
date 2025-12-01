@@ -1,0 +1,2427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarMaster - Tienda de Autos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #000000;
+            overflow-x: hidden;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background-color: #1a1a1a;
+            color: rgb(255, 255, 255);
+            box-shadow: 0 2px 10px rgb(0, 0, 0);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-bar h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ff6a00;
+            text-shadow:
+                0 0 5px #ff6a00,
+                0 0 10px #ff6a00,
+                0 0 20px #ff6a00;
+            cursor: pointer;
+        }
+
+        .nav-bar h3 span {
+            color: rgb(255, 255, 255);
+            text-shadow:
+                0 0 5px rgb(255, 255, 255),
+                0 0 10px rgb(255, 255, 255),
+                0 0 20px rgb(255, 255, 255);
+        }
+
+        .main-menu ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .main-menu li {
+            cursor: pointer;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        .main-menu li:hover {
+            color: #ff6a00;
+            text-shadow:
+                0 0 5px #ff6a00,
+                0 0 10px #ff6a00,
+                0 0 20px #ff6a00;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-menu li.active {
+            color: #ff6b00;
+            text-shadow:
+                0 0 5px #ff6a00,
+                0 0 10px #ff6a00,
+                0 0 20px #ff6a00;
+            background-color: rgba(255, 107, 0, 0.1);
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .cart-icon:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff6b00;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background-color: rgb(255, 255, 255);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.267);
+            z-index: 1000;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-header h3 {
+            color: #1a1a1a;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .cart-items {
+            margin-bottom: 1.5rem;
+        }
+
+        .cart-item {
+            display: flex;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #000000;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 60px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .item-price {
+            color: #ff6b00;
+            font-weight: 600;
+        }
+
+        .item-quantity {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .quantity-btn {
+            background: #f5f5f5;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity {
+            margin: 0 0.5rem;
+        }
+
+        .remove-item {
+            color: #ff6b00;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: auto;
+            align-self: flex-start;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #ff6b00;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background-color: #e55d00;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #777;
+            padding: 2rem 0;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Estilos para las pestañas */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Estilos específicos para cada pestaña */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1694103224829-58754b9f87b1?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1932');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: #ff6b00;
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #ffffff;
+            box-shadow: 
+                0 0 5px #ff6a00,
+                0 0 10px #ff6a00,
+                0 0 20px #ff6a00;
+        }
+
+        .cars-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: #1a1a1a;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .car-card {
+            background-color: rgb(0, 0, 0);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.61);
+            transition: transform 0.3s;
+        }
+
+        .car-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .car-image {
+            height: 200px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .car-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .car-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff6b00;
+            color: white;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .car-details {
+            padding: 1.5rem;
+        }
+
+        .car-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .car-description {
+            color: #ffffff;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .car-features {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+
+        .car-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .car-price {
+            color: #ff6b00;
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            padding: 0.7rem;
+            background-color: #ff6b00;
+            color: rgb(0, 0, 0);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background-color: #ffffff;
+            box-shadow: 
+                0 0 5px #ff6a00,
+                0 0 10px #ff6a00,
+                0 0 20px #ff6a00;
+
+        }
+
+        .filter-section {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .filter-title {
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background-color: #f5f5f5;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .filter-btn.active {
+            background-color: #ff6b00;
+            color: white;
+        }
+
+        /* Estilos para la barra de búsqueda */
+        .search-section {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ff6b00;
+        }
+
+        .search-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: #ff6b00;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: #e55d00;
+        }
+
+        .search-results-info {
+            margin-top: 1rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #777;
+            font-size: 1.1rem;
+        }
+
+        /* Estilos para la pestaña de Contacto */
+        .contact-section {
+            background-color: rgb(0, 0, 0);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.274);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .contact-info h3 {
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #ff6b00;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .contact-details h4 {
+            color: white;
+            margin-bottom: 0.3rem;
+        }
+
+        .contact-details p {
+            color: #ffffff;
+        }
+
+        .contact-form h3 {
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background-color: #ff6b00;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #e55d00;
+        }
+
+        /* Estilos para la pestaña Nosotros */
+        .about-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .about-text h2 {
+            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+        }
+
+        .about-text p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .about-image {
+            height: 300px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .values-section {
+            margin-top: 3rem;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .value-card {
+            text-align: center;
+            padding: 2rem 1rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .value-icon {
+            width: 70px;
+            height: 70px;
+            background-color: #ff6b00;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .value-card h3 {
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .value-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Nuevos estilos para el footer */
+        footer {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ff6b00;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background-color: #ff6b00;
+        }
+
+        .footer-section p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff6b00;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #333;
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background-color: #ff6b00;
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding: 1.5rem 1rem 0;
+            border-top: 1px solid #333;
+            text-align: center;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .newsletter-form input {
+            padding: 0.8rem;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #2a2a2a;
+            color: white;
+        }
+
+        .newsletter-form input:focus {
+            outline: none;
+            border-color: #ff6b00;
+        }
+
+        /* Estilos para el modal de autenticación */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1100;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .auth-content {
+            background-color: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .auth-header {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .auth-header h3 {
+            color: #ff6b00;
+            text-align: center;
+        }
+
+        .close-auth {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .auth-tab.active {
+            background-color: white;
+            border-bottom: 2px solid #ff6b00;
+            font-weight: 600;
+            color: black;
+        }
+
+        .auth-form {
+            padding: 2rem;
+            color: black;
+        }
+
+        .auth-form-section {
+            display: none;
+            color: black;
+        }
+
+        .auth-form-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+        }
+
+        .form-footer a {
+            color: #ff6b00;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .user-info:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            background-color: #ff6b00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            padding: 0.3rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Menú hamburguesa para móviles - CORREGIDO */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 101;
+        }
+
+        /* Media Queries para Responsive Design - CORREGIDO */
+        @media (max-width: 1024px) {
+            .nav-bar {
+                padding: 1rem;
+            }
+            
+            .main-menu ul {
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-bar {
+                flex-wrap: wrap;
+                padding: 1rem;
+                position: relative;
+            }
+
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+            }
+
+            .main-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: #1a1a1a;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+                z-index: 101;
+                display: none;
+            }
+
+            .main-menu.active {
+                display: block;
+                animation: slideDown 0.3s ease;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .main-menu ul {
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+            }
+
+            .main-menu li {
+                width: 100%;
+                text-align: center;
+                padding: 1rem;
+                margin: 0;
+                border-radius: 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .main-menu li:last-child {
+                border-bottom: none;
+            }
+
+            .main-menu li:hover {
+                background-color: rgba(255, 107, 0, 0.2);
+            }
+
+            .cart-icon {
+                justify-content: center;
+            }
+
+            #user-info-container {
+                width: 100%;
+            }
+
+            .user-info {
+                justify-content: center;
+                width: 100%;
+                margin-left: 0;
+            }
+
+            #auth-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .cart-modal {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .hero {
+                height: 50vh;
+                min-height: 350px;
+                padding: 1rem;
+            }
+
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .filter-options {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .filter-btn {
+                flex: 0 0 calc(50% - 0.25rem);
+                margin-bottom: 0.5rem;
+            }
+
+            .contact-grid,
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .footer-section h3::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+            
+            .user-info {
+                margin-left: 0;
+                margin-top: 0.5rem;
+                justify-content: center;
+            }
+
+            .cars-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+
+            .about-section,
+            .contact-section {
+                padding: 1.5rem;
+            }
+
+            .auth-form {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-bar h3 {
+                font-size: 1.5rem;
+            }
+
+            .hero {
+                height: 40vh;
+                min-height: 300px;
+            }
+
+            .hero-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .cars-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .car-features {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .car-feature {
+                justify-content: center;
+            }
+
+            .filter-btn {
+                flex: 0 0 100%;
+            }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .item-image {
+                margin-right: 0;
+                margin-bottom: 1rem;
+                width: 100%;
+                height: 100px;
+            }
+
+            .item-quantity {
+                justify-content: center;
+            }
+
+            .remove-item {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* Mejoras de accesibilidad */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Mejoras de legibilidad en móviles */
+        @media (max-width: 768px) {
+            body {
+                font-size: 16px; /* Previene el zoom en iOS */
+            }
+            
+            input, textarea, select {
+                font-size: 16px; /* Previene el zoom en iOS */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <button class="menu-toggle" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h3 id="inicio-tab">Car<span>Master</span></h3>
+        <div class="main-menu" id="main-menu">        
+            <ul id="menu">
+                <li class="active" data-tab="inicio">INICIO</li>
+                <li data-tab="autos">AUTOS</li>
+                <li data-tab="contacto">CONTACTO</li>
+                <li data-tab="nosotros">NOSOTROS</li>
+                <li class="cart-icon" id="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                </li>
+                <!-- Elemento de información del usuario (se mostrará cuando el usuario inicie sesión) -->
+                <li id="user-info-container" style="display: none;">
+                    <div class="user-info" id="user-info">
+                        <div class="user-avatar" id="user-avatar"></div>
+                        <span class="user-name" id="user-name"></span>
+                        <button class="logout-btn" id="logout-btn" title="Cerrar sesión">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </li>
+                <!-- Botón de inicio de sesión/registro (se mostrará cuando el usuario no haya iniciado sesión) -->
+                <li id="auth-buttons">
+                    <i class="fas fa-user"></i> Iniciar Sesión
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Pestaña INICIO -->
+        <div id="inicio" class="tab-content active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Encuentra el Auto de Tus Sueños</h1>
+                    <p>Explora nuestra amplia selección de vehículos de alta calidad a precios competitivos.</p>
+                    <a href="#" class="btn" id="ver-catalogo-btn">Ver Catálogo</a>
+                </div>
+            </div>
+
+            <div class="about-preview">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2>Bienvenido a CarMaster</h2>
+                        <p>En CarMaster nos dedicamos a ofrecerte la mejor experiencia en compra de autos. Con años de experiencia en el mercado, nos hemos consolidado como líderes en venta de vehículos de calidad.</p>
+                        <p>Nuestro compromiso es brindarte autos confiables, con los mejores precios y un servicio post-venta excepcional.</p>
+                        <button class="btn" id="saber-mas-btn">Saber Más</button>
+                    </div>
+                    <div class="about-image">
+                        <img src="https://images.unsplash.com/photo-1704736713601-b22e36ab9cbb?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170" alt="Showroom de CarMaster">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña AUTOS -->
+        <div id="autos" class="tab-content">
+            <!-- Sección de búsqueda -->
+            <div class="search-section">
+                <h3 class="filter-title">Buscar vehículos:</h3>
+                <div class="search-container">
+                    <input type="text" class="search-input" id="search-input" placeholder="Buscar por nombre, categoría o características...">
+                    <button class="search-btn" id="search-btn">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+                <div class="search-results-info" id="search-results-info"></div>
+            </div>
+
+            <div class="filter-section">
+                <h3 class="filter-title">Filtrar por categoría:</h3>
+                <div class="filter-options">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="sedan">Sedán</button>
+                    <button class="filter-btn" data-filter="suv">SUV</button>
+                    <button class="filter-btn" data-filter="deportivo">Deportivo</button>
+                    <button class="filter-btn" data-filter="electrico">Eléctrico</button>
+                    <button class="filter-btn" data-filter="lujo">Lujo</button>
+                </div>
+            </div>
+
+            <div class="cars-section">
+                <h2 class="section-title">Nuestros Vehículos</h2>
+                <div class="cars-grid" id="cars-grid">
+                    <!-- Los autos se cargarán dinámicamente aquí -->
+                </div>
+                <div class="no-results" id="no-results" style="display: none;">
+                    No se encontraron vehículos que coincidan con tu búsqueda.
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña CONTACTO -->
+        <div id="contacto" class="tab-content">
+            <div class="contact-section">
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <h3>Información de Contacto</h3>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Dirección</h4>
+                                <p> El Vivero, Delegación Tlalpan C.P. 14315 Ciudad de México</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Teléfono</h4>
+                                <p>+52 55 8719 2231</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Email</h4>
+                                <p>info@carmaster.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Horario de Atención</h4>
+                                <p>Lunes a Viernes: 9:00 - 18:00<br>Sábados: 9:00 - 14:00</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-form">
+                        <h3>Envíanos un Mensaje</h3>
+                        <form id="contact-form">
+                            <div class="form-group">
+                                <label for="name">Nombre</label>
+                                <input type="text" id="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="subject">Asunto</label>
+                                <input type="text" id="subject" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Mensaje</label>
+                                <textarea id="message" required></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">Enviar Mensaje</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña NOSOTROS -->
+        <div id="nosotros" class="tab-content">
+            <div class="about-section">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2>Nuestra Historia</h2>
+                        <p>CarMaster nació en 2025 como un intermediario para ayudar a usuarios a encontrar el vehículo ideal para sus necesidades a precios competitivos.</p>
+                        <p>A lo largo de los años, hemos crecido hasta convertirnos en una de las principales distribuidoras de autos en la región, manteniendo siempre nuestro compromiso con la calidad y el servicio al cliente.</p>
+                        <p>Nuestro equipo está formado por apasionados del automóvil que entienden las necesidades de nuestros clientes y trabajan incansablemente para superar sus expectativas.</p>
+                    </div>
+                    <div class="about-image">
+                        <img src="https://uploads.metropoles.com/wp-content/uploads/2024/02/29114020/Novo-BYD-Dolphin-MINI-2024-7.jpg" alt="Equipo de CarMaster">
+                    </div>
+                </div>
+
+                <div class="values-section">
+                    <h2 class="section-title">Nuestros Valores</h2>
+                    <div class="values-grid">
+                        <div class="value-card">
+                            <div class="value-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <h3>Confianza</h3>
+                            <p>Construimos relaciones duraderas basadas en la transparencia y honestidad con nuestros clientes.</p>
+                        </div>
+                        <div class="value-card">
+                            <div class="value-icon">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <h3>Calidad</h3>
+                            <p>Seleccionamos cuidadosamente cada vehículo para garantizar los más altos estándares de calidad.</p>
+                        </div>
+                        <div class="value-card">
+                            <div class="value-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>Servicio</h3>
+                            <p>Nuestro equipo está siempre disponible para brindarte la mejor atención y asesoramiento.</p>
+                        </div>
+                        <div class="value-card">
+                            <div class="value-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h3>Pasión</h3>
+                            <p>Amamos los autos y nos apasiona ayudar a nuestros clientes a encontrar el vehículo perfecto.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            
+            
+            <div class="footer-section">
+                <h3>Enlaces Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="#" data-tab="inicio">Inicio</a></li>
+                    <li><a href="#" data-tab="autos">Autos</a></li>
+                    <li><a href="#" data-tab="contacto">Contacto</a></li>
+                    <li><a href="#" data-tab="nosotros">Nosotros</a></li>
+                    
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contacto</h3>
+                <p><i class="fas fa-map-marker-alt"></i> El Vivero, Delegación Tlalpan C.P. 14315 Ciudad de México</p>
+                <p><i class="fas fa-phone"></i> +52 55 8719 2231</p>
+                <p><i class="fas fa-envelope"></i> info@carmaster.com</p>
+                <p><i class="fas fa-clock"></i> Lun-Vie: 9:00 - 18:00 | Sáb: 9:00 - 14:00</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Suscríbete para recibir ofertas exclusivas y novedades sobre nuestros vehículos.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Tu correo electrónico" required>
+                    <button type="submit" class="submit-btn">Suscribirse</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 CarMaster. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Modal del Carrito -->
+    <div class="overlay" id="overlay"></div>
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-header">
+            <h3>Tu Carrito de Compras</h3>
+            <button class="close-cart" id="close-cart">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <!-- Los elementos del carrito se agregarán aquí dinámicamente -->
+            <div class="empty-cart" id="empty-cart">Tu carrito está vacío</div>
+        </div>
+        <div class="cart-total">
+            <span>Total:</span>
+            <span id="cart-total-price">$0</span>
+        </div>
+        <button class="checkout-btn" id="checkout-btn">Proceder al Pago</button>
+    </div>
+
+    <!-- Modal de Autenticación (Registro/Inicio de Sesión) -->
+    <div class="auth-modal" id="auth-modal">
+        <div class="auth-content">
+            <div class="auth-header">
+                <h3>Bienvenido a CarMaster</h3>
+                <button class="close-auth" id="close-auth">&times;</button>
+            </div>
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Iniciar Sesión</div>
+                <div class="auth-tab" data-tab="register">Registrarse</div>
+            </div>
+            <div class="auth-form">
+                <!-- Formulario de Inicio de Sesión -->
+                <div class="auth-form-section active" id="login-section">
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Contraseña</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="submit-btn" style="width: 100%;">Iniciar Sesión</button>
+                    </form>
+                    <div class="form-footer">
+                        ¿No tienes una cuenta? <a id="show-register">Regístrate aquí</a>
+                    </div>
+                </div>
+
+                <!-- Formulario de Registro -->
+                <div class="auth-form-section" id="register-section">
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label for="register-name">Nombre Completo</label>
+                            <input type="text" id="register-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Contraseña</label>
+                            <input type="password" id="register-password" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-confirm-password">Confirmar Contraseña</label>
+                            <input type="password" id="register-confirm-password" required>
+                        </div>
+                        <button type="submit" class="submit-btn" style="width: 100%;">Registrarse</button>
+                    </form>
+                    <div class="form-footer">
+                        ¿Ya tienes una cuenta? <a id="show-login">Inicia sesión aquí</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elementos del DOM
+        const cartIcon = document.getElementById('cart-icon');
+        const cartModal = document.getElementById('cart-modal');
+        const closeCart = document.getElementById('close-cart');
+        const overlay = document.getElementById('overlay');
+        const cartItems = document.getElementById('cart-items');
+        const cartCount = document.getElementById('cart-count');
+        const cartTotalPrice = document.getElementById('cart-total-price');
+        const emptyCart = document.getElementById('empty-cart');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const carsGrid = document.getElementById('cars-grid');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const menuItems = document.querySelectorAll('.main-menu li[data-tab]');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const inicioTab = document.getElementById('inicio-tab');
+        const verCatalogoBtn = document.getElementById('ver-catalogo-btn');
+        const saberMasBtn = document.getElementById('saber-mas-btn');
+        const contactForm = document.getElementById('contact-form');
+        
+        // Elementos de búsqueda
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const searchResultsInfo = document.getElementById('search-results-info');
+        const noResults = document.getElementById('no-results');
+
+        // Elementos de autenticación
+        const authModal = document.getElementById('auth-modal');
+        const closeAuth = document.getElementById('close-auth');
+        const authButtons = document.getElementById('auth-buttons');
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const loginSection = document.getElementById('login-section');
+        const registerSection = document.getElementById('register-section');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        const userInfoContainer = document.getElementById('user-info-container');
+        const userAvatar = document.getElementById('user-avatar');
+        const userName = document.getElementById('user-name');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Elementos del menú móvil
+        const menuToggle = document.getElementById('menu-toggle');
+        const mainMenu = document.getElementById('main-menu');
+
+        // Carrito de compras
+        let cart = [];
+
+        // Variables para búsqueda y filtrado
+        let currentFilter = 'all';
+        let currentSearchTerm = '';
+
+        // Usuario actual
+        let currentUser = null;
+
+        // Lista de autos disponibles
+        const cars = [
+            {
+                id: 1,
+                name: "Toyota Corolla 2023",
+                price: 24500,
+                category: "sedan",
+                image: "https://i.gaw.to/vehicles/photos/40/29/402975-2023-toyota-corolla.jpg",
+                description: "Sedán compacto confiable y eficiente en combustible.",
+                features: {
+                    motor: "2.0L 4 cilindros",
+                    transmision: "Automática",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 2,
+                name: "Honda CR-V 2023",
+                price: 31200,
+                category: "suv",
+                image: "https://www.motortrend.com/uploads/2022/07/2023-Honda-CR-V-reveal-2.jpg",
+                description: "SUV versátil con amplio espacio interior y tecnología avanzada.",
+                features: {
+                    motor: "1.5L Turbo",
+                    transmision: "CVT",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 3,
+                name: "Ford Mustang GT",
+                price: 42800,
+                category: "deportivo",
+                image: "https://tse2.mm.bing.net/th/id/OIP.fLKZW8DwhsZOmQm5GW_IRAHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
+                description: "Icono americano con potencia y estilo inigualables.",
+                features: {
+                    motor: "5.0L V8",
+                    transmision: "Manual 6 velocidades",
+                    pasajeros: 4
+                }
+            },
+            {
+                id: 4,
+                name: "Tesla Model 3",
+                price: 42990,
+                category: "electrico",
+                image: "https://tse1.mm.bing.net/th/id/OIP.kvy6yciEcE6bRs_mhM0HUAHaE8?rs=1&pid=ImgDetMain&o=7&rm=3",
+                description: "Eléctrico de alto rendimiento con autonomía extendida.",
+                features: {
+                    motor: "Eléctrico",
+                    transmision: "Automática",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 5,
+                name: "BMW Serie 3",
+                price: 43900,
+                category: "lujo",
+                image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+                description: "Sedán de lujo con excelente manejo y confort.",
+                features: {
+                    motor: "2.0L Turbo",
+                    transmision: "Automática 8 velocidades",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 6,
+                name: "Jeep Wrangler",
+                price: 35900,
+                category: "suv",
+                image: "https://static1.topspeedimages.com/wordpress/wp-content/uploads/2023/02/jeep-wrangler-4xe.jpg",
+                description: "Vehiculo todoterreno legendario con capacidades off-road.",
+                features: {
+                    motor: "3.6L V6",
+                    transmision: "Manual/automática",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 7,
+                name: "Chevrolet Bolt EV",
+                price: 26500,
+                category: "electrico",
+                image: "https://media.ed.edmunds-media.com/chevrolet/bolt-ev/2023/oem/2023_chevrolet_bolt-ev_4dr-hatchback_2lt_fq_oem_1_1280.jpg",
+                description: "Eléctrico compacto con gran autonomía y espacio interior.",
+                features: {
+                    motor: "Eléctrico",
+                    transmision: "Automática",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 8,
+                name: "Mercedes-Benz Clase C",
+                price: 48900,
+                category: "lujo",
+                image: "https://cdn.motor1.com/images/mgl/qnPRz/s1/lanzamiento-mercedes-benz-clase-c-sedan-2019.jpg",
+                description: "Elegante sedán premium con tecnología de vanguardia.",
+                features: {
+                    motor: "2.0L Turbo",
+                    transmision: "Automática 9 velocidades",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 9,
+                name: "Mazda CX-5",
+                price: 28900,
+                category: "suv",
+                image: "https://static0.carbuzzimages.com/wordpress/wp-content/uploads/2025/01/2024-mazda-cx-5.jpg",
+                description: "SUV con diseño refinado y manejo deportivo.",
+                features: {
+                    motor: "2.5L 4 cilindros",
+                    transmision: "Automática",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 10,
+                name: "Hyundai Elantra",
+                price: 21900,
+                category: "sedan",
+                image: "https://www.carscoops.com/wp-content/uploads/2023/08/2024-Hyundai-Elantra-US-34.jpg",
+                description: "Sedán moderno con garantía extendida y buen equipamiento.",
+                features: {
+                    motor: "2.0L 4 cilindros",
+                    transmision: "CVT",
+                    pasajeros: 5
+                }
+            },
+            {
+                id: 11,
+                name: "Porsche 911 Carrera",
+                price: 106100,
+                category: "deportivo",
+                image: "https://th.bing.com/th/id/R.1748d0d2c666178f436cd2bb897e1416?rik=9%2fCsdSi1wPyx9w&riu=http%3a%2f%2fs1.paultan.org%2fimage%2f2015%2f09%2f2016-991-gen-porsche-911-carrera-carrera-s-facelift-12-e1441589472783.jpg&ehk=Fky92RwV1U3%2fFpxLmubNrNPkvHj1YQWi%2bIAF6ObmPtQ%3d&risl=&pid=ImgRaw&r=0",
+                description: "Deportivo legendario con rendimiento excepcional.",
+                features: {
+                    motor: "3.0L Twin-Turbo",
+                    transmision: "PDK 8 velocidades",
+                    pasajeros: 4
+                }
+            },
+            {
+                id: 12,
+                name: "Audi e-tron",
+                price: 69900,
+                category: "electrico",
+                image: "https://tse1.mm.bing.net/th/id/OIP.-rPZMtEBgqMO-_NlsS3pKgHaE8?rs=1&pid=ImgDetMain&o=7&rm=3",
+                description: "SUV eléctrico premium con tecnología Quattro.",
+                features: {
+                    motor: "Dual eléctrico",
+                    transmision: "Automática",
+                    pasajeros: 5
+                }
+            },
+
+            {
+                id: 13,
+                name: "Mitsubishi Lancer",
+                price: 100000,
+                category: "sedan",
+                image: "https://fotos.perfil.com/2021/11/30/mitsubishi-lancer-evolution-1277087.jpg",
+                description: "Sedan mitico japones, cuatro puertas, ideal para la familia.",
+                features: {
+                    motor: "3.0L Twin-Turbo",
+                    transmision: "Automática",
+                    pasajeros: 4
+                }
+            },
+
+        ];
+
+        // Función para guardar el carrito en Local Storage
+        function saveCartToLocalStorage() {
+            localStorage.setItem('carMasterCart', JSON.stringify(cart));
+        }
+
+        // Función para cargar el carrito desde Local Storage
+        function loadCartFromLocalStorage() {
+            const savedCart = localStorage.getItem('carMasterCart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCart();
+            }
+        }
+
+        // Función para guardar usuarios en Local Storage
+        function saveUsersToLocalStorage(users) {
+            localStorage.setItem('carMasterUsers', JSON.stringify(users));
+        }
+
+        // Función para cargar usuarios desde Local Storage
+        function loadUsersFromLocalStorage() {
+            const savedUsers = localStorage.getItem('carMasterUsers');
+            return savedUsers ? JSON.parse(savedUsers) : [];
+        }
+
+        // Función para guardar el usuario actual en Local Storage
+        function saveCurrentUserToLocalStorage(user) {
+            localStorage.setItem('carMasterCurrentUser', JSON.stringify(user));
+        }
+
+        // Función para cargar el usuario actual desde Local Storage
+        function loadCurrentUserFromLocalStorage() {
+            const savedUser = localStorage.getItem('carMasterCurrentUser');
+            return savedUser ? JSON.parse(savedUser) : null;
+        }
+
+        // Función para mostrar/ocultar elementos de autenticación
+        function updateAuthUI() {
+            if (currentUser) {
+                // Usuario ha iniciado sesión
+                authButtons.style.display = 'none';
+                userInfoContainer.style.display = 'block';
+                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+                userName.textContent = currentUser.name;
+            } else {
+                // Usuario no ha iniciado sesión
+                authButtons.style.display = 'block';
+                userInfoContainer.style.display = 'none';
+            }
+        }
+
+        // Función para cambiar entre pestañas de autenticación
+        function switchAuthTab(tabName) {
+            // Remover clase active de todas las pestañas
+            authTabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Ocultar todas las secciones
+            loginSection.classList.remove('active');
+            registerSection.classList.remove('active');
+            
+            // Activar la pestaña seleccionada
+            document.querySelector(`.auth-tab[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Mostrar la sección correspondiente
+            if (tabName === 'login') {
+                loginSection.classList.add('active');
+            } else {
+                registerSection.classList.add('active');
+            }
+        }
+
+        // Función para registrar un nuevo usuario
+        function registerUser(name, email, password) {
+            const users = loadUsersFromLocalStorage();
+            
+            // Verificar si el usuario ya existe
+            const existingUser = users.find(user => user.email === email);
+            if (existingUser) {
+                return { success: false, message: 'Ya existe un usuario con este email' };
+            }
+            
+            // Crear nuevo usuario
+            const newUser = {
+                id: Date.now().toString(),
+                name,
+                email,
+                password // En una aplicación real, esto debería estar encriptado
+            };
+            
+            users.push(newUser);
+            saveUsersToLocalStorage(users);
+            
+            return { success: true, message: 'Usuario registrado exitosamente' };
+        }
+
+        // Función para iniciar sesión
+        function loginUser(email, password) {
+            const users = loadUsersFromLocalStorage();
+            
+            // Buscar usuario
+            const user = users.find(user => user.email === email && user.password === password);
+            if (!user) {
+                return { success: false, message: 'Email o contraseña incorrectos' };
+            }
+            
+            // Iniciar sesión exitosamente
+            currentUser = {
+                id: user.id,
+                name: user.name,
+                email: user.email
+            };
+            
+            saveCurrentUserToLocalStorage(currentUser);
+            updateAuthUI();
+            
+            return { success: true, message: 'Inicio de sesión exitoso' };
+        }
+
+        // Función para cerrar sesión
+        function logoutUser() {
+            currentUser = null;
+            localStorage.removeItem('carMasterCurrentUser');
+            updateAuthUI();
+        }
+
+        // Navegación entre pestañas
+        function switchTab(tabName) {
+            // Ocultar todos los contenidos de pestañas
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remover clase active de todos los elementos del menú
+            menuItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Mostrar la pestaña seleccionada
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activar el elemento del menú correspondiente
+            document.querySelector(`.main-menu li[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Si se cambia a la pestaña de autos, cargar los autos
+            if (tabName === 'autos') {
+                loadCars();
+            }
+            
+            // Cerrar menú móvil si está abierto
+            if (window.innerWidth <= 768) {
+                mainMenu.classList.remove('active');
+            }
+        }
+
+        // Event listeners para navegación
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const tabName = item.getAttribute('data-tab');
+                switchTab(tabName);
+            });
+        });
+
+        inicioTab.addEventListener('click', () => {
+            switchTab('inicio');
+        });
+
+        verCatalogoBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab('autos');
+        });
+
+        saberMasBtn.addEventListener('click', () => {
+            switchTab('nosotros');
+        });
+
+        // Función de búsqueda
+        function performSearch() {
+            currentSearchTerm = searchInput.value.trim().toLowerCase();
+            loadCars(currentFilter, currentSearchTerm);
+        }
+
+        // Event listeners para búsqueda
+        searchBtn.addEventListener('click', performSearch);
+        
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Cargar autos en la página
+        function loadCars(filter = 'all', searchTerm = '') {
+            carsGrid.innerHTML = '';
+            noResults.style.display = 'none';
+            
+            let filteredCars = filter === 'all' ? cars : cars.filter(car => car.category === filter);
+            
+            // Aplicar búsqueda si hay un término
+            if (searchTerm) {
+                filteredCars = filteredCars.filter(car => {
+                    return (
+                        car.name.toLowerCase().includes(searchTerm) ||
+                        car.description.toLowerCase().includes(searchTerm) ||
+                        car.features.motor.toLowerCase().includes(searchTerm) ||
+                        car.features.transmision.toLowerCase().includes(searchTerm) ||
+                        getCategoryName(car.category).toLowerCase().includes(searchTerm)
+                    );
+                });
+            }
+            
+            // Mostrar información de resultados
+            if (searchTerm) {
+                if (filteredCars.length === 0) {
+                    searchResultsInfo.textContent = `No se encontraron vehículos para "${searchTerm}"`;
+                    noResults.style.display = 'block';
+                } else {
+                    searchResultsInfo.textContent = `Se encontraron ${filteredCars.length} vehículos para "${searchTerm}"`;
+                }
+            } else {
+                searchResultsInfo.textContent = '';
+            }
+            
+            // Mostrar autos
+            filteredCars.forEach(car => {
+                const carCard = document.createElement('div');
+                carCard.className = 'car-card';
+                carCard.innerHTML = `
+                    <div class="car-image">
+                        <img src="${car.image}" alt="${car.name}" loading="lazy">
+                        <div class="car-badge">${getCategoryName(car.category)}</div>
+                    </div>
+                    <div class="car-details">
+                        <h3 class="car-name">${car.name}</h3>
+                        <p class="car-description">${car.description}</p>
+                        <div class="car-features">
+                            <div class="car-feature">
+                                <i class="fas fa-gas-pump"></i>
+                                <span>${car.features.motor}</span>
+                            </div>
+                            <div class="car-feature">
+                                <i class="fas fa-cog"></i>
+                                <span>${car.features.transmision}</span>
+                            </div>
+                            <div class="car-feature">
+                                <i class="fas fa-user"></i>
+                                <span>${car.features.pasajeros}</span>
+                            </div>
+                        </div>
+                        <p class="car-price">$${car.price.toLocaleString()}</p>
+                        <button class="add-to-cart" data-id="${car.id}" data-name="${car.name}" data-price="${car.price}">Agregar al Carrito</button>
+                    </div>
+                `;
+                carsGrid.appendChild(carCard);
+            });
+            
+            // Agregar event listeners a los botones de agregar al carrito
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', () => {
+                    const id = button.getAttribute('data-id');
+                    const name = button.getAttribute('data-name');
+                    const price = parseFloat(button.getAttribute('data-price'));
+                    
+                    // Verificar si el producto ya está en el carrito
+                    const existingItem = cart.find(item => item.id === id);
+                    
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push({
+                            id,
+                            name,
+                            price,
+                            quantity: 1
+                        });
+                    }
+                    
+                    updateCart();
+                    saveCartToLocalStorage(); // Guardar en Local Storage
+                    
+                    // Animación de confirmación
+                    button.textContent = '¡Agregado!';
+                    setTimeout(() => {
+                        button.textContent = 'Agregar al Carrito';
+                    }, 1500);
+                });
+            });
+        }
+
+        // Obtener nombre de categoría para mostrar
+        function getCategoryName(category) {
+            const categories = {
+                sedan: 'Sedán',
+                suv: 'SUV',
+                deportivo: 'Deportivo',
+                electrico: 'Eléctrico',
+                lujo: 'Lujo'
+            };
+            return categories[category] || category;
+        }
+
+        // Filtrado de autos
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remover clase active de todos los botones
+                filterBtns.forEach(b => b.classList.remove('active'));
+                // Agregar clase active al botón clickeado
+                btn.classList.add('active');
+                
+                // Filtrar autos
+                currentFilter = btn.getAttribute('data-filter');
+                loadCars(currentFilter, currentSearchTerm);
+            });
+        });
+
+        // Abrir carrito
+        cartIcon.addEventListener('click', () => {
+            cartModal.style.display = 'block';
+            overlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Cerrar carrito
+        closeCart.addEventListener('click', () => {
+            cartModal.style.display = 'none';
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        overlay.addEventListener('click', () => {
+            cartModal.style.display = 'none';
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Abrir modal de autenticación
+        authButtons.addEventListener('click', () => {
+            authModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Cerrar modal de autenticación
+        closeAuth.addEventListener('click', () => {
+            authModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Cerrar modal de autenticación al hacer clic fuera
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Cambiar entre pestañas de autenticación
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                switchAuthTab(tabName);
+            });
+        });
+
+        // Mostrar formulario de registro
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('register');
+        });
+
+        // Mostrar formulario de inicio de sesión
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchAuthTab('login');
+        });
+
+        // Manejar registro de usuario
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            // Validaciones
+            if (password !== confirmPassword) {
+                alert('Las contraseñas no coinciden');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+            
+            // Registrar usuario
+            const result = registerUser(name, email, password);
+            
+            if (result.success) {
+                alert(result.message);
+                registerForm.reset();
+                switchAuthTab('login');
+            } else {
+                alert(result.message);
+            }
+        });
+
+        // Manejar inicio de sesión
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Iniciar sesión
+            const result = loginUser(email, password);
+            
+            if (result.success) {
+                alert(result.message);
+                loginForm.reset();
+                authModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            } else {
+                alert(result.message);
+            }
+        });
+
+        // Manejar cierre de sesión
+        logoutBtn.addEventListener('click', () => {
+            logoutUser();
+        });
+
+        // Actualizar carrito
+        function updateCart() {
+            // Actualizar contador
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            // Actualizar lista de productos
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                emptyCart.style.display = 'block';
+                checkoutBtn.disabled = true;
+            } else {
+                emptyCart.style.display = 'none';
+                checkoutBtn.disabled = false;
+                
+                cart.forEach(item => {
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div class="item-image">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="item-details">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-price">$${item.price.toLocaleString()}</div>
+                            <div class="item-quantity">
+                                <button class="quantity-btn decrease" data-id="${item.id}">-</button>
+                                <span class="quantity">${item.quantity}</span>
+                                <button class="quantity-btn increase" data-id="${item.id}">+</button>
+                            </div>
+                        </div>
+                        <button class="remove-item" data-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+                
+                // Agregar event listeners a los botones de cantidad y eliminar
+                document.querySelectorAll('.decrease').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const id = button.getAttribute('data-id');
+                        decreaseQuantity(id);
+                    });
+                });
+                
+                document.querySelectorAll('.increase').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const id = button.getAttribute('data-id');
+                        increaseQuantity(id);
+                    });
+                });
+                
+                document.querySelectorAll('.remove-item').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const id = button.getAttribute('data-id');
+                        removeFromCart(id);
+                    });
+                });
+            }
+            
+            // Actualizar total
+            const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            cartTotalPrice.textContent = `$${totalPrice.toLocaleString()}`;
+        }
+
+        // Disminuir cantidad
+        function decreaseQuantity(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                } else {
+                    removeFromCart(id);
+                    return;
+                }
+                updateCart();
+                saveCartToLocalStorage(); // Guardar en Local Storage
+            }
+        }
+
+        // Aumentar cantidad
+        function increaseQuantity(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += 1;
+                updateCart();
+                saveCartToLocalStorage(); // Guardar en Local Storage
+            }
+        }
+
+        // Eliminar producto
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+            saveCartToLocalStorage(); // Guardar en Local Storage
+        }
+
+        // Procesar compra
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length > 0) {
+                alert('¡Gracias por tu compra! Total: $' + 
+                      cart.reduce((total, item) => total + (item.price * item.quantity), 0).toLocaleString());
+                cart = [];
+                updateCart();
+                saveCartToLocalStorage(); // Guardar en Local Storage
+                cartModal.style.display = 'none';
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Manejar formulario de contacto
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('¡Gracias por tu mensaje! Te contactaremos pronto.');
+            contactForm.reset();
+        });
+
+        // Agregar funcionalidad a los enlaces del footer
+        document.querySelectorAll('.footer-links a[data-tab]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabName = link.getAttribute('data-tab');
+                switchTab(tabName);
+                
+                // Desplazar hacia arriba para ver la pestaña seleccionada
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Manejar el formulario de newsletter
+        document.querySelector('.newsletter-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            alert(`¡Gracias por suscribirte con el correo: ${email}!`);
+            e.target.reset();
+        });
+
+        // Toggle del menú móvil - CORREGIDO
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            mainMenu.classList.toggle('active');
+        });
+
+        // Cerrar menú móvil al hacer clic fuera - CORREGIDO
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                !mainMenu.contains(e.target) && 
+                !menuToggle.contains(e.target) &&
+                mainMenu.classList.contains('active')) {
+                mainMenu.classList.remove('active');
+            }
+        });
+
+        // Cerrar menú móvil al hacer clic en un enlace - NUEVO
+        document.querySelectorAll('.main-menu li[data-tab]').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    mainMenu.classList.remove('active');
+                }
+            });
+        });
+
+        // Ajustar el menú al cambiar el tamaño de la ventana - CORREGIDO
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                mainMenu.style.display = '';
+                mainMenu.classList.remove('active');
+            } else {
+                if (!mainMenu.classList.contains('active')) {
+                    mainMenu.style.display = 'none';
+                } else {
+                    mainMenu.style.display = 'block';
+                }
+            }
+        });
+
+        // Inicializar la página
+        function init() {
+            loadCartFromLocalStorage(); // Cargar carrito desde Local Storage
+            loadCars();
+            
+            // Cargar usuario actual si existe
+            currentUser = loadCurrentUserFromLocalStorage();
+            updateAuthUI();
+            
+            // Inicializar menú móvil
+            if (window.innerWidth <= 768) {
+                mainMenu.style.display = 'none';
+            }
+        }
+
+        // Ejecutar inicialización
+        init();
+    </script>
+</body>
+</html>
