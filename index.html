@@ -962,7 +962,7 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* Menú hamburguesa para móviles - CORREGIDO */
+        /* Menú hamburguesa para móviles - VERSIÓN CORREGIDA */
         .menu-toggle {
             display: none;
             background: none;
@@ -974,7 +974,7 @@
             z-index: 101;
         }
 
-        /* Media Queries para Responsive Design - CORREGIDO */
+        /* Media Queries para Responsive Design - VERSIÓN CORREGIDA */
         @media (max-width: 1024px) {
             .nav-bar {
                 padding: 1rem;
@@ -998,39 +998,40 @@
                 justify-content: center;
                 width: 40px;
                 height: 40px;
+                margin-left: auto;
+                order: 2;
+            }
+
+            .nav-bar h3 {
+                order: 1;
             }
 
             .main-menu {
+                order: 3;
                 position: absolute;
                 top: 100%;
                 left: 0;
                 width: 100%;
                 background-color: #1a1a1a;
-                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-                z-index: 101;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                z-index: 100;
                 display: none;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
             }
 
             .main-menu.active {
                 display: block;
-                animation: slideDown 0.3s ease;
-            }
-
-            @keyframes slideDown {
-                from {
-                    opacity: 0;
-                    transform: translateY(-10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+                max-height: 500px;
+                transition: max-height 0.5s ease-in;
             }
 
             .main-menu ul {
                 flex-direction: column;
                 gap: 0;
                 padding: 1rem 0;
+                width: 100%;
             }
 
             .main-menu li {
@@ -1052,21 +1053,39 @@
 
             .cart-icon {
                 justify-content: center;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                margin: 0;
             }
 
             #user-info-container {
                 width: 100%;
+                padding: 0;
             }
 
             .user-info {
                 justify-content: center;
                 width: 100%;
                 margin-left: 0;
+                padding: 1rem;
             }
 
             #auth-buttons {
                 justify-content: center;
                 width: 100%;
+                padding: 1rem;
+                margin: 0;
+            }
+
+            /* Asegurar que los elementos del carrito e inicio de sesión se vean bien */
+            .main-menu li:has(.cart-icon),
+            .main-menu li:has(#user-info-container),
+            .main-menu li:has(#auth-buttons) {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0.5rem;
             }
 
             .cart-modal {
@@ -1145,6 +1164,16 @@
         @media (max-width: 480px) {
             .nav-bar h3 {
                 font-size: 1.5rem;
+            }
+
+            .menu-toggle {
+                font-size: 1.3rem;
+                width: 35px;
+                height: 35px;
+            }
+            
+            .main-menu.active {
+                max-height: 600px;
             }
 
             .hero {
@@ -1227,10 +1256,10 @@
 </head>
 <body>
     <div class="nav-bar">
+        <h3 id="inicio-tab">Car<span>Master</span></h3>
         <button class="menu-toggle" id="menu-toggle">
             <i class="fas fa-bars"></i>
         </button>
-        <h3 id="inicio-tab">Car<span>Master</span></h3>
         <div class="main-menu" id="main-menu">        
             <ul id="menu">
                 <li class="active" data-tab="inicio">INICIO</li>
@@ -1601,9 +1630,10 @@
         const userName = document.getElementById('user-name');
         const logoutBtn = document.getElementById('logout-btn');
 
-        // Elementos del menú móvil
+        // Elementos del menú móvil - CORREGIDO
         const menuToggle = document.getElementById('menu-toggle');
         const mainMenu = document.getElementById('main-menu');
+        const menuIcon = menuToggle.querySelector('i');
 
         // Carrito de compras
         let cart = [];
@@ -1942,7 +1972,37 @@
             
             // Cerrar menú móvil si está abierto
             if (window.innerWidth <= 768) {
-                mainMenu.classList.remove('active');
+                closeMobileMenu();
+            }
+        }
+
+        // Función para cerrar el menú móvil
+        function closeMobileMenu() {
+            mainMenu.classList.remove('active');
+            menuIcon.classList.remove('fa-times');
+            menuIcon.classList.add('fa-bars');
+            mainMenu.style.maxHeight = '0';
+            
+            setTimeout(() => {
+                if (!mainMenu.classList.contains('active')) {
+                    mainMenu.style.display = 'none';
+                }
+            }, 300);
+        }
+
+        // Función para abrir/cerrar el menú móvil
+        function toggleMobileMenu() {
+            if (mainMenu.classList.contains('active')) {
+                closeMobileMenu();
+            } else {
+                mainMenu.classList.add('active');
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+                mainMenu.style.display = 'block';
+                
+                // Calcular la altura necesaria para todos los elementos
+                const menuHeight = mainMenu.scrollHeight;
+                mainMenu.style.maxHeight = menuHeight + 'px';
             }
         }
 
@@ -2368,25 +2428,25 @@
 
         // Toggle del menú móvil - CORREGIDO
         menuToggle.addEventListener('click', (e) => {
-            e.stopPropagation(); 
-            mainMenu.classList.toggle('active');
+            e.stopPropagation();
+            toggleMobileMenu();
         });
 
         // Cerrar menú móvil al hacer clic fuera - CORREGIDO
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 768 && 
+                mainMenu.classList.contains('active') &&
                 !mainMenu.contains(e.target) && 
-                !menuToggle.contains(e.target) &&
-                mainMenu.classList.contains('active')) {
-                mainMenu.classList.remove('active');
+                !menuToggle.contains(e.target)) {
+                closeMobileMenu();
             }
         });
 
-        // Cerrar menú móvil al hacer clic en un enlace - NUEVO
-        document.querySelectorAll('.main-menu li[data-tab]').forEach(item => {
+        // Cerrar menú móvil al hacer clic en un enlace - CORREGIDO
+        document.querySelectorAll('.main-menu li[data-tab], .main-menu a').forEach(item => {
             item.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    mainMenu.classList.remove('active');
+                if (window.innerWidth <= 768 && mainMenu.classList.contains('active')) {
+                    closeMobileMenu();
                 }
             });
         });
@@ -2394,13 +2454,21 @@
         // Ajustar el menú al cambiar el tamaño de la ventana - CORREGIDO
         window.addEventListener('resize', () => {
             if (window.innerWidth > 768) {
+                // Para desktop
                 mainMenu.style.display = '';
                 mainMenu.classList.remove('active');
+                mainMenu.style.maxHeight = '';
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
             } else {
+                // Para móvil
                 if (!mainMenu.classList.contains('active')) {
                     mainMenu.style.display = 'none';
+                    mainMenu.style.maxHeight = '0';
                 } else {
                     mainMenu.style.display = 'block';
+                    const menuHeight = mainMenu.scrollHeight;
+                    mainMenu.style.maxHeight = menuHeight + 'px';
                 }
             }
         });
@@ -2417,6 +2485,7 @@
             // Inicializar menú móvil
             if (window.innerWidth <= 768) {
                 mainMenu.style.display = 'none';
+                mainMenu.style.maxHeight = '0';
             }
         }
 
