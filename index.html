@@ -2845,5 +2845,170 @@
         
         init();
     </script>
+
+    <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+<script>
+// Configuración de Firebase (obtén esto de tu consola de Firebase)
+const firebaseConfig = {
+  apiKey: "AIzaSyAmRGMm3idgwQ_cqMTWOfIH5fPjlJV_gDQ",
+  authDomain: "carmaster-ed133.firebaseapp.com",
+  projectId: "carmaster-ed133",
+  storageBucket: "carmaster-ed133.firebasestorage.app",
+  messagingSenderId: "653732740473",
+  appId: "1:653732740473:web:4620a32a74d30f53af03a8",
+  measurementId: "G-0KQ7J2PHXC"
+};
+
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+const storage = firebase.storage();
+
+// ========== FUNCIONES PARA BASE DE DATOS ==========
+
+// Guardar producto en Firestore
+async function guardarProducto(producto) {
+    try {
+        const docRef = await db.collection('productos').add({
+            ...producto,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        console.log('Producto guardado con ID:', docRef.id);
+        return { success: true, id: docRef.id };
+    } catch (error) {
+        console.error('Error al guardar:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Obtener todos los productos
+async function obtenerProductos() {
+    try {
+        const snapshot = await db.collection('productos').get();
+        const productos = [];
+        snapshot.forEach(doc => {
+            productos.push({ id: doc.id, ...doc.data() });
+        });
+        return { success: true, data: productos };
+    } catch (error) {
+        console.error('Error al obtener:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Guardar usuario
+async function guardarUsuario(usuario) {
+    try {
+        const docRef = await db.collection('usuarios').doc(usuario.id).set({
+            ...usuario,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error al guardar usuario:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Guardar carrito
+async function guardarCarrito(userId, carrito) {
+    try {
+        await db.collection('carritos').doc(userId).set({
+            items: carrito,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error al guardar carrito:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Obtener carrito
+async function obtenerCarrito(userId) {
+    try {
+        const doc = await db.collection('carritos').doc(userId).get();
+        if (doc.exists) {
+            return { success: true, data: doc.data().items };
+        }
+        return { success: true, data: [] };
+    } catch (error) {
+        console.error('Error al obtener carrito:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Guardar orden/compra
+async function guardarOrden(userId, orden) {
+    try {
+        const docRef = await db.collection('ordenes').add({
+            userId: userId,
+            ...orden,
+            fecha: firebase.firestore.FieldValue.serverTimestamp(),
+            estado: 'pendiente'
+        });
+        return { success: true, id: docRef.id };
+    } catch (error) {
+        console.error('Error al guardar orden:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Obtener órdenes del usuario
+async function obtenerOrdenes(userId) {
+    try {
+        const snapshot = await db.collection('ordenes')
+            .where('userId', '==', userId)
+            .orderBy('fecha', 'desc')
+            .get();
+        
+        const ordenes = [];
+        snapshot.forEach(doc => {
+            ordenes.push({ id: doc.id, ...doc.data() });
+        });
+        return { success: true, data: ordenes };
+    } catch (error) {
+        console.error('Error al obtener órdenes:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Autenticación con Firebase
+async function registrarUsuarioFirebase(email, password, nombre) {
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        // Guardar información adicional del usuario
+        await guardarUsuario({
+            id: user.uid,
+            nombre: nombre,
+            email: email,
+            createdAt: new Date()
+        });
+        
+        return { success: true, user: user };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+async function loginUsuarioFirebase(email, password) {
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        return { success: true, user: userCredential.user };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+</script>
+
+
 </body>
 </html>
