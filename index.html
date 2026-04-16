@@ -6,6 +6,7 @@
     <title>CarMaster - Tienda de Autopartes Tuning</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* TODOS TUS ESTILOS EXISTENTES SE MANTIENEN IGUALES */
         * {
             margin: 0;
             padding: 0;
@@ -1943,7 +1944,7 @@
                             <div class="contact-icon"><i class="fas fa-envelope"></i></div>
                             <div class="contact-details">
                                 <h4>Email</h4>
-                                <p>info@carmaster.com</p>
+                                <p>infocarmastertunning@gmail.com</p>
                             </div>
                         </div>
                         <div class="contact-item">
@@ -2089,6 +2090,53 @@
     </div>
 
     <script>
+        // ========== FUNCIÓN PARA ENVIAR CORREO (SOLO ESTO SE AGREGA) ==========
+        async function sendEmail(formData) {
+            // Usamos FormSubmit.co que es gratuito y no requiere registro
+            const formSubmitUrl = 'https://formsubmit.co/ajax/infocarmastertunning@gmail.com';
+            
+            const submitData = {
+                name: formData.name,
+                email: formData.email,
+                subject: formData.subject,
+                message: formData.message,
+                _captcha: 'false',
+                _template: 'table',
+                _subject: `Nuevo mensaje de contacto - CarMaster: ${formData.subject}`
+            };
+            
+            try {
+                const response = await fetch(formSubmitUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(submitData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success !== false) {
+                    return { success: true, message: 'Mensaje enviado exitosamente' };
+                } else {
+                    throw new Error('Error al enviar');
+                }
+            } catch (error) {
+                console.error('Error con FormSubmit:', error);
+                // Fallback: abrir cliente de correo
+                const mailtoLink = `mailto:infocarmastertunning@gmail.com?subject=${encodeURIComponent(`Contacto CarMaster: ${formData.subject}`)}&body=${encodeURIComponent(
+                    `Nombre: ${formData.name}\n` +
+                    `Email: ${formData.email}\n` +
+                    `Asunto: ${formData.subject}\n\n` +
+                    `Mensaje:\n${formData.message}\n\n` +
+                    `---\nEste mensaje fue enviado desde el formulario de contacto de CarMaster Tuning.`
+                )}`;
+                window.location.href = mailtoLink;
+                return { success: true, message: 'Se abrirá tu cliente de correo', isMailto: true };
+            }
+        }
+
         // Elementos del DOM
         const cartIcon = document.getElementById('cart-icon');
         const cartModal = document.getElementById('cart-modal');
@@ -2175,7 +2223,6 @@
             const slidesContainer = document.getElementById('carousel-slides');
             const dotsContainer = document.getElementById('carousel-dots');
             
-            // Crear dots
             for (let i = 0; i < totalSlides; i++) {
                 const dot = document.createElement('div');
                 dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
@@ -2186,16 +2233,13 @@
             updateCarousel();
             startAutoSlide();
             
-            // Eventos de los botones
             document.getElementById('carousel-prev').addEventListener('click', prevSlide);
             document.getElementById('carousel-next').addEventListener('click', nextSlide);
             
-            // Pausar auto-slide al hacer hover
             const carouselContainer = document.querySelector('.carousel-container');
             carouselContainer.addEventListener('mouseenter', stopAutoSlide);
             carouselContainer.addEventListener('mouseleave', startAutoSlide);
             
-            // Eventos de los botones dentro del carrusel
             document.querySelectorAll('.carousel-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -2204,9 +2248,7 @@
                         switchTab('autos');
                         setTimeout(() => {
                             const filterBtn = Array.from(filterBtns).find(b => b.getAttribute('data-filter') === category);
-                            if (filterBtn) {
-                                filterBtn.click();
-                            }
+                            if (filterBtn) filterBtn.click();
                         }, 100);
                     }
                 });
@@ -2216,37 +2258,15 @@
         function updateCarousel() {
             const slidesContainer = document.getElementById('carousel-slides');
             slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-            
-            // Actualizar dots
             const dots = document.querySelectorAll('.carousel-dot');
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === currentSlide);
-            });
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
         }
         
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            updateCarousel();
-        }
-        
-        function prevSlide() {
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-            updateCarousel();
-        }
-        
-        function goToSlide(index) {
-            currentSlide = index;
-            updateCarousel();
-        }
-        
-        function startAutoSlide() {
-            if (autoSlideInterval) clearInterval(autoSlideInterval);
-            autoSlideInterval = setInterval(nextSlide, 5000);
-        }
-        
-        function stopAutoSlide() {
-            if (autoSlideInterval) clearInterval(autoSlideInterval);
-        }
+        function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateCarousel(); }
+        function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateCarousel(); }
+        function goToSlide(index) { currentSlide = index; updateCarousel(); }
+        function startAutoSlide() { if (autoSlideInterval) clearInterval(autoSlideInterval); autoSlideInterval = setInterval(nextSlide, 5000); }
+        function stopAutoSlide() { if (autoSlideInterval) clearInterval(autoSlideInterval); }
 
         // Funciones de almacenamiento local
         function saveCartToLocalStorage() { localStorage.setItem('carMasterCart', JSON.stringify(cart)); }
@@ -2302,7 +2322,6 @@
                 document.getElementById('display-cardholder').textContent = '-';
                 document.getElementById('display-expiry').textContent = '-';
             }
-            
             loadAddresses();
         }
         
@@ -2391,9 +2410,7 @@
         function showAddAddressModal() { editingAddressId = null; document.getElementById('address-modal-title').textContent = 'Agregar dirección'; document.getElementById('address-form').reset(); document.getElementById('address-primary').checked = false; document.getElementById('address-modal').style.display = 'flex'; }
         function closeAddressModal() { document.getElementById('address-modal').style.display = 'none'; }
         function editAddress(index) { editingAddressId = index; const addr = userProfile.addresses[index]; document.getElementById('address-modal-title').textContent = 'Editar dirección'; document.getElementById('address-street').value = addr.street; document.getElementById('address-colony').value = addr.colony; document.getElementById('address-city').value = addr.city; document.getElementById('address-state').value = addr.state; document.getElementById('address-zip').value = addr.zip; document.getElementById('address-country').value = addr.country; document.getElementById('address-primary').checked = addr.isPrimary || false; document.getElementById('address-modal').style.display = 'flex'; }
-        
         function deleteAddress(index) { if (confirm('¿Eliminar esta dirección?')) { userProfile.addresses.splice(index, 1); saveUserProfileToLocalStorage(); loadAddresses(); } }
-        
         function setPrimaryAddress(index) { userProfile.addresses.forEach((addr, i) => addr.isPrimary = (i === index)); saveUserProfileToLocalStorage(); loadAddresses(); }
         
         document.getElementById('address-form').addEventListener('submit', (e) => {
@@ -2491,7 +2508,6 @@
             if (window.innerWidth <= 768) closeMobileMenu();
         }
         
-        // Función para mostrar página de producto
         function showProductPage(productId) {
             const product = cars.find(c => c.id == productId);
             if (!product) return;
@@ -2558,23 +2574,14 @@
             else { mainMenu.classList.add('active'); menuIcon.classList.remove('fa-bars'); menuIcon.classList.add('fa-times'); mainMenu.style.display = 'block'; mainMenu.style.maxHeight = mainMenu.scrollHeight + 'px'; }
         }
         
-        // Funciones de autopartes, carrito y envíos
         function getCategoryName(category) {
             const categories = { ruedas: 'Llantas & Rines', escape: 'Sistemas Escape', suspension: 'Suspensión', carroceria: 'Kit Carrocería', iluminacion: 'Iluminación LED' };
             return categories[category] || category;
         }
         
-        function getCartSubtotal() {
-            return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-        }
-        
-        function getShippingPrice() {
-            return selectedShipping ? selectedShipping.price : 0;
-        }
-        
-        function getCartTotal() {
-            return getCartSubtotal() + getShippingPrice();
-        }
+        function getCartSubtotal() { return cart.reduce((total, item) => total + (item.price * item.quantity), 0); }
+        function getShippingPrice() { return selectedShipping ? selectedShipping.price : 0; }
+        function getCartTotal() { return getCartSubtotal() + getShippingPrice(); }
         
         function renderShippingOptions() {
             if (!shippingOptionsDiv) return;
@@ -2702,7 +2709,61 @@
         
         function performSearch() { currentSearchTerm = searchInput.value.trim().toLowerCase(); loadCars(currentFilter, currentSearchTerm); }
         
-        // Event listeners
+        // ========== EVENT LISTENER DEL FORMULARIO DE CONTACTO MODIFICADO ==========
+        contactForm.addEventListener('submit', async (e) => { 
+            e.preventDefault();
+            
+            const submitBtn = contactForm.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            submitBtn.disabled = true;
+            
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                subject: document.getElementById('subject').value.trim(),
+                message: document.getElementById('message').value.trim()
+            };
+            
+            // Validaciones
+            if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                alert('Por favor, completa todos los campos');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                alert('Por favor, ingresa un correo electrónico válido');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            try {
+                const result = await sendEmail(formData);
+                
+                if (result.success) {
+                    if (result.isMailto) {
+                        alert('Se abrirá tu cliente de correo para completar el envío');
+                    } else {
+                        alert('¡Gracias por tu mensaje! Te contactaremos a la brevedad.');
+                    }
+                    contactForm.reset();
+                } else {
+                    alert('Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión. Por favor, intenta más tarde.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // ========== RESTO DEL CÓDIGO ORIGINAL SIN MODIFICAR ==========
         menuItems.forEach(item => item.addEventListener('click', () => switchTab(item.getAttribute('data-tab'))));
         inicioTab.addEventListener('click', () => switchTab('inicio'));
         verCatalogoBtn.addEventListener('click', (e) => { e.preventDefault(); switchTab('autos'); });
@@ -2754,7 +2815,6 @@
             }
         });
         
-        contactForm.addEventListener('submit', (e) => { e.preventDefault(); alert('¡Gracias por tu mensaje! Te contactaremos pronto.'); contactForm.reset(); });
         document.querySelectorAll('.footer-links a[data-tab]').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); switchTab(link.getAttribute('data-tab')); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
         document.querySelector('.newsletter-form').addEventListener('submit', (e) => { e.preventDefault(); alert(`¡Gracias por suscribirte con el correo: ${e.target.querySelector('input[type="email"]').value}!`); e.target.reset(); });
         
